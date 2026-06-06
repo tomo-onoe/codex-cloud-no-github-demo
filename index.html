@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>家計メモ</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #d8dee9;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --danger: #dc2626;
+      --danger-bg: #fee2e2;
+      --focus: #93c5fd;
+      --shadow: 0 12px 32px rgba(31, 41, 55, 0.10);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(180deg, #eef4ff 0%, var(--bg) 38%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+    }
+
+    .app {
+      width: min(100%, 720px);
+      margin: 0 auto;
+      padding: 20px 14px 40px;
+    }
+
+    header {
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 10px 0 6px;
+      font-size: clamp(1.8rem, 8vw, 2.5rem);
+      letter-spacing: 0.02em;
+    }
+
+    .lead {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.98rem;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(216, 222, 233, 0.9);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+
+    form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    label {
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    input {
+      width: 100%;
+      min-height: 48px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: var(--text);
+      background: #fff;
+      font: inherit;
+      font-size: 1rem;
+    }
+
+    input:focus {
+      outline: 3px solid var(--focus);
+      border-color: var(--primary);
+    }
+
+    button {
+      min-height: 48px;
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .add-button {
+      width: 100%;
+      margin-top: 4px;
+      background: var(--primary);
+      color: #fff;
+      font-size: 1.05rem;
+    }
+
+    .add-button:active {
+      background: var(--primary-dark);
+      transform: translateY(1px);
+    }
+
+    .error {
+      min-height: 1.4em;
+      margin: 2px 0 0;
+      color: var(--danger);
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
+    .summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 16px 0;
+      padding: 16px;
+    }
+
+    .summary-label {
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .summary-amount {
+      font-size: clamp(1.6rem, 8vw, 2.3rem);
+      font-weight: 900;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+    }
+
+    .list-header {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 0 2px 8px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1.25rem;
+    }
+
+    .count {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .entries {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .entry {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      padding: 14px;
+    }
+
+    .entry-main {
+      min-width: 0;
+    }
+
+    .entry-top {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .category {
+      overflow-wrap: anywhere;
+      font-weight: 900;
+      font-size: 1.08rem;
+    }
+
+    .amount {
+      font-weight: 900;
+      font-size: 1.18rem;
+      white-space: nowrap;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 10px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .memo {
+      width: 100%;
+      overflow-wrap: anywhere;
+    }
+
+    .delete-button {
+      width: 100%;
+      background: var(--danger-bg);
+      color: var(--danger);
+    }
+
+    .empty {
+      margin: 0;
+      padding: 24px 16px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .note {
+      margin: 16px 2px 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    @media (min-width: 640px) {
+      .app {
+        padding-top: 34px;
+      }
+
+      .card {
+        padding: 20px;
+      }
+
+      form {
+        grid-template-columns: 1fr 1fr;
+        align-items: start;
+      }
+
+      .field-full,
+      .error,
+      .add-button {
+        grid-column: 1 / -1;
+      }
+
+      .entry {
+        grid-template-columns: 1fr auto;
+        align-items: center;
+      }
+
+      .delete-button {
+        width: auto;
+        min-width: 92px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header>
+      <h1>家計メモ</h1>
+      <p class="lead">ブラウザだけで使える、シンプルな支出メモです。</p>
+    </header>
+
+    <section class="card" aria-label="家計メモの入力">
+      <form id="entry-form" novalidate>
+        <div class="field">
+          <label for="date">日付</label>
+          <input id="date" name="date" type="date" required>
+        </div>
+
+        <div class="field">
+          <label for="category">カテゴリ</label>
+          <input id="category" name="category" type="text" placeholder="例: 食費" autocomplete="off" required>
+        </div>
+
+        <div class="field">
+          <label for="amount">金額</label>
+          <input id="amount" name="amount" type="number" inputmode="numeric" min="0" step="1" placeholder="例: 1200" required>
+        </div>
+
+        <div class="field field-full">
+          <label for="memo">メモ</label>
+          <input id="memo" name="memo" type="text" placeholder="例: スーパーで買い物" autocomplete="off">
+        </div>
+
+        <p id="error" class="error" role="alert" aria-live="polite"></p>
+        <button class="add-button" type="submit">追加する</button>
+      </form>
+    </section>
+
+    <section class="summary card" aria-label="合計金額">
+      <span class="summary-label">合計</span>
+      <strong id="total" class="summary-amount">¥0</strong>
+    </section>
+
+    <section aria-label="登録済みデータ">
+      <div class="list-header">
+        <h2>一覧</h2>
+        <span id="count" class="count">0件</span>
+      </div>
+      <ul id="entries" class="entries"></ul>
+      <p id="empty" class="empty card">まだメモがありません。最初の支出を追加してください。</p>
+    </section>
+
+    <p class="note">データは、このページを開いたブラウザの localStorage に保存されます。</p>
+  </main>
+
+  <script>
+    const STORAGE_KEY = "householdMemoEntries";
+
+    const form = document.getElementById("entry-form");
+    const dateInput = document.getElementById("date");
+    const categoryInput = document.getElementById("category");
+    const amountInput = document.getElementById("amount");
+    const memoInput = document.getElementById("memo");
+    const errorMessage = document.getElementById("error");
+    const entriesList = document.getElementById("entries");
+    const emptyMessage = document.getElementById("empty");
+    const totalAmount = document.getElementById("total");
+    const countLabel = document.getElementById("count");
+
+    let entries = loadEntries();
+
+    function loadEntries() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        return saved ? JSON.parse(saved) : [];
+      } catch (error) {
+        console.warn("保存済みデータを読み込めませんでした。", error);
+        return [];
+      }
+    }
+
+    function saveEntries() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+    }
+
+    function formatCurrency(value) {
+      return "¥" + value.toLocaleString("ja-JP");
+    }
+
+    function escapeHtml(value) {
+      return value
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function renderEntries() {
+      entriesList.innerHTML = "";
+
+      const total = entries.reduce((sum, entry) => sum + entry.amount, 0);
+      totalAmount.textContent = formatCurrency(total);
+      countLabel.textContent = entries.length + "件";
+      emptyMessage.hidden = entries.length > 0;
+
+      entries.forEach((entry) => {
+        const item = document.createElement("li");
+        item.className = "entry card";
+        item.innerHTML = `
+          <div class="entry-main">
+            <div class="entry-top">
+              <span class="category">${escapeHtml(entry.category)}</span>
+              <span class="amount">${formatCurrency(entry.amount)}</span>
+            </div>
+            <div class="meta">
+              <span>${escapeHtml(entry.date)}</span>
+              <span class="memo">${escapeHtml(entry.memo || "メモなし")}</span>
+            </div>
+          </div>
+          <button class="delete-button" type="button" data-id="${entry.id}" aria-label="${escapeHtml(entry.category)}を削除">削除</button>
+        `;
+        entriesList.appendChild(item);
+      });
+    }
+
+    function resetForm() {
+      form.reset();
+      dateInput.valueAsDate = new Date();
+      categoryInput.focus();
+    }
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      errorMessage.textContent = "";
+
+      const amount = Number(amountInput.value);
+      if (amountInput.value.trim() === "" || !Number.isFinite(amount)) {
+        errorMessage.textContent = "金額は数値で入力してください。";
+        amountInput.focus();
+        return;
+      }
+
+      entries.unshift({
+        id: typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+        date: dateInput.value || new Date().toISOString().slice(0, 10),
+        category: categoryInput.value.trim() || "未分類",
+        amount,
+        memo: memoInput.value.trim()
+      });
+
+      saveEntries();
+      renderEntries();
+      resetForm();
+    });
+
+    entriesList.addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-id]");
+      if (!button) return;
+
+      entries = entries.filter((entry) => entry.id !== button.dataset.id);
+      saveEntries();
+      renderEntries();
+    });
+
+    dateInput.valueAsDate = new Date();
+    renderEntries();
+  </script>
+</body>
+</html>
