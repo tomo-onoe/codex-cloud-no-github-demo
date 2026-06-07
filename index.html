@@ -3,65 +3,131 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>家計メモ</title>
+  <title>家計メモ - 食事の節約フライト</title>
   <style>
     :root {
       color-scheme: light;
-      --bg: #f6f7fb;
+      --bg-start: #e0f2fe;
+      --bg-end: #f8fafc;
       --card: #ffffff;
-      --text: #1f2937;
-      --muted: #6b7280;
-      --line: #d8dee9;
+      --text: #172033;
+      --muted: #64748b;
+      --line: #dbe4ef;
       --primary: #2563eb;
       --primary-dark: #1d4ed8;
+      --accent: #0ea5e9;
+      --success: #15803d;
+      --success-bg: #dcfce7;
+      --warning: #b45309;
+      --warning-bg: #fef3c7;
       --danger: #dc2626;
       --danger-bg: #fee2e2;
+      --shadow: 0 16px 38px rgba(15, 23, 42, 0.12);
       --focus: #93c5fd;
-      --shadow: 0 12px 32px rgba(31, 41, 55, 0.10);
     }
 
     * {
       box-sizing: border-box;
     }
 
+    html {
+      -webkit-text-size-adjust: 100%;
+    }
+
     body {
       margin: 0;
       min-height: 100vh;
-      background: linear-gradient(180deg, #eef4ff 0%, var(--bg) 38%);
+      background:
+        radial-gradient(circle at top left, rgba(14, 165, 233, 0.18), transparent 30rem),
+        linear-gradient(180deg, var(--bg-start) 0%, var(--bg-end) 42%);
       color: var(--text);
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       line-height: 1.5;
     }
 
     .app {
-      width: min(100%, 720px);
+      width: min(100%, 760px);
       margin: 0 auto;
-      padding: 20px 14px 40px;
+      padding: 18px 14px 42px;
     }
 
     header {
-      margin-bottom: 16px;
+      padding: 8px 4px 14px;
       text-align: center;
     }
 
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
     h1 {
-      margin: 10px 0 6px;
-      font-size: clamp(1.8rem, 8vw, 2.5rem);
+      margin-bottom: 8px;
+      font-size: clamp(1.9rem, 8vw, 2.7rem);
       letter-spacing: 0.02em;
     }
 
+    h2 {
+      margin-bottom: 12px;
+      font-size: 1.28rem;
+    }
+
+    h3 {
+      margin-bottom: 6px;
+      font-size: 1rem;
+    }
+
     .lead {
-      margin: 0;
+      margin-bottom: 0;
       color: var(--muted);
       font-size: 0.98rem;
     }
 
     .card {
-      background: var(--card);
-      border: 1px solid rgba(216, 222, 233, 0.9);
-      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid rgba(219, 228, 239, 0.95);
+      border-radius: 22px;
       box-shadow: var(--shadow);
       padding: 16px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 16px;
+    }
+
+    .budget-grid,
+    .stats-grid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 1fr;
+    }
+
+    .budget-item,
+    .stat-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 14px;
+      background: #f8fbff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+    }
+
+    .budget-name,
+    .stat-label {
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .budget-amount,
+    .stat-value {
+      font-size: 1.15rem;
+      font-weight: 900;
+      white-space: nowrap;
     }
 
     form {
@@ -69,84 +135,195 @@
       gap: 14px;
     }
 
+    .fixed-category {
+      margin: 0 0 12px;
+      padding: 10px 12px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 14px;
+      color: #1e40af;
+      font-weight: 800;
+    }
+
     .field {
       display: grid;
-      gap: 6px;
+      gap: 7px;
     }
 
     label {
-      font-weight: 700;
       font-size: 0.95rem;
+      font-weight: 850;
     }
 
-    input {
-      width: 100%;
-      min-height: 48px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 12px 14px;
-      color: var(--text);
-      background: #fff;
+    input,
+    select,
+    button {
       font: inherit;
+    }
+
+    input,
+    select {
+      width: 100%;
+      min-height: 52px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 14px;
+      background: #fff;
+      color: var(--text);
       font-size: 1rem;
     }
 
-    input:focus {
+    input:focus,
+    select:focus,
+    button:focus-visible {
       outline: 3px solid var(--focus);
+      outline-offset: 2px;
       border-color: var(--primary);
     }
 
     button {
-      min-height: 48px;
+      min-height: 52px;
       border: 0;
-      border-radius: 12px;
+      border-radius: 14px;
       padding: 12px 16px;
-      font: inherit;
-      font-weight: 800;
       cursor: pointer;
+      font-weight: 900;
       touch-action: manipulation;
     }
 
     .add-button {
       width: 100%;
-      margin-top: 4px;
-      background: var(--primary);
+      margin-top: 2px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
       color: #fff;
-      font-size: 1.05rem;
+      font-size: 1.08rem;
+      box-shadow: 0 10px 18px rgba(37, 99, 235, 0.22);
     }
 
-    .add-button:active {
-      background: var(--primary-dark);
+    .add-button:active,
+    .delete-button:active {
       transform: translateY(1px);
     }
 
     .error {
       min-height: 1.4em;
-      margin: 2px 0 0;
+      margin: 0;
       color: var(--danger);
-      font-weight: 700;
       font-size: 0.92rem;
+      font-weight: 800;
     }
 
-    .summary {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin: 16px 0;
-      padding: 16px;
+    .flight-panel {
+      position: relative;
+      overflow: hidden;
+      min-height: 132px;
+      background:
+        linear-gradient(180deg, #dff5ff 0%, #f7fdff 68%),
+        #e0f2fe;
     }
 
-    .summary-label {
+    .flight-panel::after {
+      content: "";
+      position: absolute;
+      right: -42px;
+      bottom: -52px;
+      width: 180px;
+      height: 92px;
+      background: rgba(255, 255, 255, 0.74);
+      border-radius: 999px;
+      box-shadow: -105px -18px 0 18px rgba(255, 255, 255, 0.45);
+    }
+
+    .flight-message {
+      position: relative;
+      z-index: 1;
+      margin: 0;
       color: var(--muted);
-      font-weight: 700;
+      font-weight: 800;
     }
 
-    .summary-amount {
-      font-size: clamp(1.6rem, 8vw, 2.3rem);
-      font-weight: 900;
-      letter-spacing: 0.01em;
-      white-space: nowrap;
+    .flight-message.good {
+      color: var(--success);
+    }
+
+    .flight-message.just {
+      color: var(--warning);
+    }
+
+    .flight-message.over {
+      color: var(--danger);
+    }
+
+    .plane {
+      position: absolute;
+      z-index: 2;
+      left: -48px;
+      bottom: 34px;
+      font-size: 32px;
+      line-height: 1;
+      transform: translateX(0) translateY(0) rotate(10deg);
+      opacity: 0;
+      filter: drop-shadow(0 8px 8px rgba(15, 23, 42, 0.18));
+      pointer-events: none;
+    }
+
+    .plane.flying {
+      animation-name: fly-across;
+      animation-timing-function: ease-in-out;
+      animation-fill-mode: both;
+    }
+
+    @keyframes fly-across {
+      0% {
+        opacity: 0;
+        transform: translateX(-8vw) translateY(14px) rotate(8deg);
+      }
+      12% {
+        opacity: 1;
+      }
+      28% {
+        transform: translateX(28vw) translateY(-18px) rotate(3deg);
+      }
+      52% {
+        transform: translateX(55vw) translateY(10px) rotate(12deg);
+      }
+      76% {
+        transform: translateX(78vw) translateY(-16px) rotate(6deg);
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: translateX(108vw) translateY(8px) rotate(10deg);
+      }
+    }
+
+    .progress {
+      display: grid;
+      gap: 8px;
+    }
+
+    .progress-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      font-weight: 800;
+    }
+
+    .progress-track {
+      height: 14px;
+      overflow: hidden;
+      background: #e2e8f0;
+      border-radius: 999px;
+    }
+
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #22c55e, #0ea5e9);
+      border-radius: inherit;
+      transition: width 260ms ease;
     }
 
     .list-header {
@@ -154,17 +331,13 @@
       align-items: end;
       justify-content: space-between;
       gap: 10px;
-      margin: 0 2px 8px;
-    }
-
-    h2 {
-      margin: 0;
-      font-size: 1.25rem;
+      margin: 4px 2px 10px;
     }
 
     .count {
       color: var(--muted);
       font-size: 0.92rem;
+      font-weight: 750;
     }
 
     .entries {
@@ -177,7 +350,6 @@
 
     .entry {
       display: grid;
-      grid-template-columns: 1fr;
       gap: 12px;
       padding: 14px;
     }
@@ -186,32 +358,57 @@
       min-width: 0;
     }
 
-    .entry-top {
+    .entry-top,
+    .entry-detail {
       display: flex;
       align-items: baseline;
       justify-content: space-between;
       gap: 10px;
-      margin-bottom: 6px;
     }
 
-    .category {
-      overflow-wrap: anywhere;
-      font-weight: 900;
-      font-size: 1.08rem;
+    .entry-top {
+      margin-bottom: 8px;
     }
 
-    .amount {
-      font-weight: 900;
+    .entry-detail {
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .entry-category {
+      font-size: 1.1rem;
+      font-weight: 950;
+    }
+
+    .entry-amount {
       font-size: 1.18rem;
+      font-weight: 950;
       white-space: nowrap;
     }
 
-    .meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px 10px;
-      color: var(--muted);
-      font-size: 0.92rem;
+    .entry-saving {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-weight: 850;
+    }
+
+    .entry-saving.positive {
+      background: var(--success-bg);
+      color: var(--success);
+    }
+
+    .entry-saving.zero {
+      background: var(--warning-bg);
+      color: var(--warning);
+    }
+
+    .entry-saving.negative {
+      background: var(--danger-bg);
+      color: var(--danger);
     }
 
     .memo {
@@ -241,11 +438,22 @@
 
     @media (min-width: 640px) {
       .app {
-        padding-top: 34px;
+        padding-top: 30px;
       }
 
       .card {
         padding: 20px;
+      }
+
+      .budget-grid,
+      .stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .budget-item,
+      .stat-item {
+        display: grid;
+        justify-items: start;
       }
 
       form {
@@ -253,6 +461,7 @@
         align-items: start;
       }
 
+      .fixed-category,
       .field-full,
       .error,
       .add-button {
@@ -266,7 +475,7 @@
 
       .delete-button {
         width: auto;
-        min-width: 92px;
+        min-width: 96px;
       }
     }
   </style>
@@ -274,66 +483,120 @@
 <body>
   <main class="app">
     <header>
-      <h1>家計メモ</h1>
-      <p class="lead">ブラウザだけで使える、シンプルな支出メモです。</p>
+      <h1>家計メモ ✈️</h1>
+      <p class="lead">食事の支出をメモして、節約できた分だけ飛行機を飛ばします。</p>
     </header>
 
-    <section class="card" aria-label="家計メモの入力">
-      <form id="entry-form" novalidate>
-        <div class="field">
-          <label for="date">日付</label>
-          <input id="date" name="date" type="date" required>
+    <div class="stack">
+      <section class="card" aria-labelledby="budget-title">
+        <h2 id="budget-title">食事カテゴリの仮置き予算</h2>
+        <div class="budget-grid" id="budget-list"></div>
+      </section>
+
+      <section class="card" aria-labelledby="form-title">
+        <h2 id="form-title">支出を追加</h2>
+        <p class="fixed-category">大カテゴリ: 食事</p>
+        <form id="entry-form" novalidate>
+          <div class="field">
+            <label for="date">日付</label>
+            <input id="date" name="date" type="date" required>
+          </div>
+
+          <div class="field">
+            <label for="sub-category">小カテゴリ</label>
+            <select id="sub-category" name="sub-category" required>
+              <option value="朝食">朝食</option>
+              <option value="昼食">昼食</option>
+              <option value="夕食">夕食</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="amount">金額</label>
+            <input id="amount" name="amount" type="number" inputmode="numeric" min="0" step="1" placeholder="例: 650" required>
+          </div>
+
+          <div class="field field-full">
+            <label for="memo">メモ</label>
+            <input id="memo" name="memo" type="text" placeholder="例: お弁当にした" autocomplete="off">
+          </div>
+
+          <p id="error" class="error" role="alert" aria-live="polite"></p>
+          <button class="add-button" type="submit">追加して飛行機チャレンジ</button>
+        </form>
+      </section>
+
+      <section class="flight-panel card" aria-label="節約フライト">
+        <h2>節約フライト</h2>
+        <p id="flight-message" class="flight-message" aria-live="polite">支出を追加すると、節約額に応じたメッセージが表示されます。</p>
+        <div id="plane" class="plane" aria-hidden="true">✈️</div>
+      </section>
+
+      <section class="card" aria-labelledby="summary-title">
+        <h2 id="summary-title">集計</h2>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-label">合計金額</span>
+            <strong id="total" class="stat-value">¥0</strong>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">累計節約額</span>
+            <strong id="total-savings" class="stat-value">¥0</strong>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">達成率</span>
+            <strong id="achievement" class="stat-value">0%</strong>
+          </div>
         </div>
-
-        <div class="field">
-          <label for="category">カテゴリ</label>
-          <input id="category" name="category" type="text" placeholder="例: 食費" autocomplete="off" required>
+        <div class="progress" aria-label="貯蓄目標の進捗">
+          <div class="progress-top">
+            <span>貯蓄目標: ¥30,000</span>
+            <span id="progress-label">0%</span>
+          </div>
+          <div class="progress-track">
+            <div id="progress-bar" class="progress-bar"></div>
+          </div>
         </div>
+      </section>
 
-        <div class="field">
-          <label for="amount">金額</label>
-          <input id="amount" name="amount" type="number" inputmode="numeric" min="0" step="1" placeholder="例: 1200" required>
+      <section aria-label="登録済みデータ">
+        <div class="list-header">
+          <h2>一覧</h2>
+          <span id="count" class="count">0件</span>
         </div>
+        <ul id="entries" class="entries"></ul>
+        <p id="empty" class="empty card">まだメモがありません。最初の食事支出を追加してください。</p>
+      </section>
+    </div>
 
-        <div class="field field-full">
-          <label for="memo">メモ</label>
-          <input id="memo" name="memo" type="text" placeholder="例: スーパーで買い物" autocomplete="off">
-        </div>
-
-        <p id="error" class="error" role="alert" aria-live="polite"></p>
-        <button class="add-button" type="submit">追加する</button>
-      </form>
-    </section>
-
-    <section class="summary card" aria-label="合計金額">
-      <span class="summary-label">合計</span>
-      <strong id="total" class="summary-amount">¥0</strong>
-    </section>
-
-    <section aria-label="登録済みデータ">
-      <div class="list-header">
-        <h2>一覧</h2>
-        <span id="count" class="count">0件</span>
-      </div>
-      <ul id="entries" class="entries"></ul>
-      <p id="empty" class="empty card">まだメモがありません。最初の支出を追加してください。</p>
-    </section>
-
-    <p class="note">データは、このページを開いたブラウザの localStorage に保存されます。</p>
+    <p class="note">データは、このページを開いたブラウザ側の localStorage に保存されます。</p>
   </main>
 
   <script>
-    const STORAGE_KEY = "householdMemoEntries";
+    const STORAGE_KEY = "mealBudgetFlightEntries";
+    const SAVINGS_GOAL = 30000;
+    const CATEGORY_BUDGETS = {
+      "朝食": 400,
+      "昼食": 800,
+      "夕食": 1200
+    };
 
     const form = document.getElementById("entry-form");
     const dateInput = document.getElementById("date");
-    const categoryInput = document.getElementById("category");
+    const subCategoryInput = document.getElementById("sub-category");
     const amountInput = document.getElementById("amount");
     const memoInput = document.getElementById("memo");
     const errorMessage = document.getElementById("error");
+    const budgetList = document.getElementById("budget-list");
+    const flightMessage = document.getElementById("flight-message");
+    const plane = document.getElementById("plane");
     const entriesList = document.getElementById("entries");
     const emptyMessage = document.getElementById("empty");
     const totalAmount = document.getElementById("total");
+    const totalSavingsAmount = document.getElementById("total-savings");
+    const achievementLabel = document.getElementById("achievement");
+    const progressLabel = document.getElementById("progress-label");
+    const progressBar = document.getElementById("progress-bar");
     const countLabel = document.getElementById("count");
 
     let entries = loadEntries();
@@ -341,11 +604,20 @@
     function loadEntries() {
       try {
         const saved = localStorage.getItem(STORAGE_KEY);
-        return saved ? JSON.parse(saved) : [];
+        const parsed = saved ? JSON.parse(saved) : [];
+        return Array.isArray(parsed) ? parsed.filter(isValidEntry) : [];
       } catch (error) {
         console.warn("保存済みデータを読み込めませんでした。", error);
         return [];
       }
+    }
+
+    function isValidEntry(entry) {
+      return entry &&
+        typeof entry.id === "string" &&
+        typeof entry.date === "string" &&
+        Object.prototype.hasOwnProperty.call(CATEGORY_BUDGETS, entry.subCategory) &&
+        Number.isFinite(entry.amount);
     }
 
     function saveEntries() {
@@ -353,11 +625,17 @@
     }
 
     function formatCurrency(value) {
-      return "¥" + value.toLocaleString("ja-JP");
+      return "¥" + Math.round(value).toLocaleString("ja-JP");
+    }
+
+    function formatPercent(value) {
+      return value.toLocaleString("ja-JP", {
+        maximumFractionDigits: 1
+      }) + "%";
     }
 
     function escapeHtml(value) {
-      return value
+      return String(value)
         .replaceAll("&", "&amp;")
         .replaceAll("<", "&lt;")
         .replaceAll(">", "&gt;")
@@ -365,29 +643,63 @@
         .replaceAll("'", "&#039;");
     }
 
+    function getSaving(entry) {
+      return CATEGORY_BUDGETS[entry.subCategory] - entry.amount;
+    }
+
+    function getPositiveSavingsTotal() {
+      return entries.reduce((sum, entry) => {
+        const saving = getSaving(entry);
+        return saving > 0 ? sum + saving : sum;
+      }, 0);
+    }
+
+    function renderBudgets() {
+      budgetList.innerHTML = Object.entries(CATEGORY_BUDGETS).map(([name, budget]) => `
+        <div class="budget-item">
+          <span class="budget-name">${escapeHtml(name)}</span>
+          <strong class="budget-amount">${formatCurrency(budget)}</strong>
+        </div>
+      `).join("");
+    }
+
     function renderEntries() {
       entriesList.innerHTML = "";
 
       const total = entries.reduce((sum, entry) => sum + entry.amount, 0);
+      const totalSavings = getPositiveSavingsTotal();
+      const achievement = SAVINGS_GOAL > 0 ? totalSavings / SAVINGS_GOAL * 100 : 0;
+      const displayAchievement = Math.min(achievement, 999.9);
+      const progressWidth = Math.min(achievement, 100);
+
       totalAmount.textContent = formatCurrency(total);
+      totalSavingsAmount.textContent = formatCurrency(totalSavings);
+      achievementLabel.textContent = formatPercent(displayAchievement);
+      progressLabel.textContent = formatPercent(displayAchievement);
+      progressBar.style.width = progressWidth + "%";
       countLabel.textContent = entries.length + "件";
       emptyMessage.hidden = entries.length > 0;
 
       entries.forEach((entry) => {
+        const saving = getSaving(entry);
+        const savingClass = saving > 0 ? "positive" : saving === 0 ? "zero" : "negative";
+        const savingText = saving > 0 ? `節約 ${formatCurrency(saving)}` : saving === 0 ? "予算ぴったり" : `予算オーバー ${formatCurrency(Math.abs(saving))}`;
         const item = document.createElement("li");
         item.className = "entry card";
         item.innerHTML = `
           <div class="entry-main">
             <div class="entry-top">
-              <span class="category">${escapeHtml(entry.category)}</span>
-              <span class="amount">${formatCurrency(entry.amount)}</span>
+              <span class="entry-category">食事 / ${escapeHtml(entry.subCategory)}</span>
+              <span class="entry-amount">${formatCurrency(entry.amount)}</span>
             </div>
-            <div class="meta">
+            <div class="entry-detail">
               <span>${escapeHtml(entry.date)}</span>
+              <span>予算 ${formatCurrency(CATEGORY_BUDGETS[entry.subCategory])}</span>
+              <span class="entry-saving ${savingClass}">${escapeHtml(savingText)}</span>
               <span class="memo">${escapeHtml(entry.memo || "メモなし")}</span>
             </div>
           </div>
-          <button class="delete-button" type="button" data-id="${entry.id}" aria-label="${escapeHtml(entry.category)}を削除">削除</button>
+          <button class="delete-button" type="button" data-id="${escapeHtml(entry.id)}" aria-label="${escapeHtml(entry.subCategory)}の支出を削除">削除</button>
         `;
         entriesList.appendChild(item);
       });
@@ -396,30 +708,71 @@
     function resetForm() {
       form.reset();
       dateInput.valueAsDate = new Date();
-      categoryInput.focus();
+      subCategoryInput.value = "朝食";
+      amountInput.focus();
+    }
+
+    function showSavingResult(saving) {
+      flightMessage.classList.remove("good", "just", "over");
+
+      if (saving > 0) {
+        flightMessage.textContent = `今回の節約額は ${formatCurrency(saving)} です。飛行機が節約フライトに出発しました！`;
+        flightMessage.classList.add("good");
+        flyPlane(saving);
+        return;
+      }
+
+      plane.classList.remove("flying");
+      if (saving === 0) {
+        flightMessage.textContent = "予算ぴったりです。飛行機は待機中です。";
+        flightMessage.classList.add("just");
+      } else {
+        flightMessage.textContent = `予算オーバーです。超過額は ${formatCurrency(Math.abs(saving))} です。`;
+        flightMessage.classList.add("over");
+      }
+    }
+
+    function flyPlane(saving) {
+      const duration = Math.min(8, 1.8 + saving / 1200 * 6.2);
+      plane.classList.remove("flying");
+      void plane.offsetWidth;
+      plane.style.animationDuration = duration + "s";
+      plane.classList.add("flying");
     }
 
     form.addEventListener("submit", (event) => {
       event.preventDefault();
       errorMessage.textContent = "";
 
-      const amount = Number(amountInput.value);
-      if (amountInput.value.trim() === "" || !Number.isFinite(amount)) {
+      const amountText = amountInput.value.trim();
+      const amount = Number(amountText);
+
+      if (amountText === "" || !Number.isFinite(amount)) {
         errorMessage.textContent = "金額は数値で入力してください。";
         amountInput.focus();
         return;
       }
 
-      entries.unshift({
+      if (amount < 0) {
+        errorMessage.textContent = "金額は0円以上で入力してください。";
+        amountInput.focus();
+        return;
+      }
+
+      const subCategory = subCategoryInput.value;
+      const entry = {
         id: typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
         date: dateInput.value || new Date().toISOString().slice(0, 10),
-        category: categoryInput.value.trim() || "未分類",
+        subCategory,
         amount,
         memo: memoInput.value.trim()
-      });
+      };
+      const saving = getSaving(entry);
 
+      entries.unshift(entry);
       saveEntries();
       renderEntries();
+      showSavingResult(saving);
       resetForm();
     });
 
@@ -433,6 +786,7 @@
     });
 
     dateInput.valueAsDate = new Date();
+    renderBudgets();
     renderEntries();
   </script>
 </body>
