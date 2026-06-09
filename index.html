@@ -125,6 +125,17 @@
       will-change: transform, opacity;
     }
 
+    .plane::before {
+      content: "";
+      position: absolute;
+      inset: 12px;
+      border: 2px solid rgba(250, 204, 21, 0.88);
+      border-left-color: transparent;
+      border-radius: 50%;
+      opacity: 0;
+      transform: scale(0.72) rotate(-35deg);
+    }
+
     .plane::after {
       content: "";
       position: absolute;
@@ -137,8 +148,24 @@
       opacity: 0.86;
     }
 
+    .plane-icon {
+      position: relative;
+      z-index: 1;
+      display: inline-block;
+      transform-origin: 50% 50%;
+      will-change: transform;
+    }
+
     .plane.flying {
       animation: fly-over-screen var(--flight-duration, 3s) cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+
+    .plane.flying.special-flight::before {
+      animation: roll-ring var(--flight-duration, 3s) ease-in-out both;
+    }
+
+    .plane.flying.special-flight .plane-icon {
+      animation: roll-once var(--flight-duration, 3s) ease-in-out both;
     }
 
     @keyframes fly-over-screen {
@@ -153,18 +180,50 @@
         transform: translateX(20vw) translateY(0) rotate(3deg) scale(1.02);
       }
       44% {
-        transform: translateX(44vw) translateY(18px) rotate(13deg) scale(1.06);
+        transform: translateX(42vw) translateY(16px) rotate(13deg) scale(1.06);
+      }
+      54% {
+        transform: translateX(52vw) translateY(4px) rotate(7deg) scale(1.08);
       }
       66% {
-        transform: translateX(68vw) translateY(4px) rotate(4deg) scale(1.03);
+        transform: translateX(66vw) translateY(6px) rotate(4deg) scale(1.03);
       }
       88% {
         opacity: 1;
-        transform: translateX(88vw) translateY(20px) rotate(12deg) scale(1);
+        transform: translateX(calc(100vw - 88px)) translateY(20px) rotate(12deg) scale(1);
       }
       100% {
         opacity: 0;
         transform: translateX(calc(100vw + 110px)) translateY(10px) rotate(8deg) scale(0.92);
+      }
+    }
+
+    @keyframes roll-once {
+      0%, 38%, 68%, 100% {
+        transform: rotate(0deg) scale(1);
+      }
+      44% {
+        transform: rotate(-90deg) scale(1.04);
+      }
+      51% {
+        transform: rotate(-210deg) scale(1.08);
+      }
+      58% {
+        transform: rotate(-360deg) scale(1.04);
+      }
+    }
+
+    @keyframes roll-ring {
+      0%, 36%, 66%, 100% {
+        opacity: 0;
+        transform: scale(0.72) rotate(-35deg);
+      }
+      45%, 58% {
+        opacity: 0.95;
+      }
+      62% {
+        opacity: 0;
+        transform: scale(1.18) rotate(315deg);
       }
     }
 
@@ -638,7 +697,7 @@
 <body>
   <div class="flight-overlay" aria-hidden="true">
     <div class="flight-path">
-      <div id="plane" class="plane">✈️</div>
+      <div id="plane" class="plane"><span class="plane-icon">✈️</span></div>
     </div>
   </div>
 
@@ -694,6 +753,7 @@
         <div class="result-chip-row" aria-label="フライトのヒント">
           <span class="result-chip">✈️ 節約できたら画面上部を飛行</span>
           <span class="result-chip">🧭 大きな節約ほど長く飛行</span>
+          <span class="result-chip">🎖️ 500円以上で一回転フライト</span>
         </div>
       </section>
 
@@ -740,6 +800,7 @@
   <script>
     const STORAGE_KEY = "mealBudgetFlightEntries";
     const SAVINGS_GOAL = 30000;
+    const SPECIAL_FLIGHT_THRESHOLD = 500;
     const CATEGORY_BUDGETS = {
       "朝食": 400,
       "昼食": 800,
@@ -881,7 +942,8 @@
       flightMessage.classList.remove("good", "just", "over");
 
       if (saving > 0) {
-        flightMessage.textContent = `${subCategory}の今回の節約額は ${formatCurrency(saving)} です。画面上部を飛行機がフライト中です！`;
+        const specialMessage = saving >= SPECIAL_FLIGHT_THRESHOLD ? " 500円以上のご褒美で、一回転フライトに入ります！" : "";
+        flightMessage.textContent = `${subCategory}の今回の節約額は ${formatCurrency(saving)} です。画面上部を飛行機がフライト中です！${specialMessage}`;
         flightMessage.classList.add("good");
         flyPlane(saving);
         return;
@@ -898,7 +960,7 @@
     }
 
     function resetPlaneAnimation() {
-      plane.classList.remove("flying");
+      plane.classList.remove("flying", "special-flight");
       plane.style.removeProperty("--flight-duration");
       void plane.offsetWidth;
     }
@@ -906,7 +968,7 @@
     function getFlightDuration(saving) {
       const minDuration = 3;
       const maxDuration = 8;
-      const maxSavingForFlight = 500;
+      const maxSavingForFlight = SPECIAL_FLIGHT_THRESHOLD;
       const savingForDuration = Math.min(Math.max(saving, 1), maxSavingForFlight);
       const progress = (savingForDuration - 1) / (maxSavingForFlight - 1);
 
@@ -917,6 +979,9 @@
       const duration = getFlightDuration(saving);
       resetPlaneAnimation();
       plane.style.setProperty("--flight-duration", duration + "s");
+      if (saving >= SPECIAL_FLIGHT_THRESHOLD) {
+        plane.classList.add("special-flight");
+      }
       plane.classList.add("flying");
     }
 
