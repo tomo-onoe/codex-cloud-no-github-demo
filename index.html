@@ -2,28 +2,32 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>家計メモ - 食事の節約フライト</title>
   <style>
     :root {
       color-scheme: light;
-      --bg-start: #e0f2fe;
-      --bg-end: #f8fafc;
-      --card: #ffffff;
+      --sky-deep: #60a5fa;
+      --sky: #bae6fd;
+      --sky-light: #eff6ff;
+      --sun: #facc15;
+      --card: rgba(255, 255, 255, 0.94);
       --text: #172033;
       --muted: #64748b;
       --line: #dbe4ef;
       --primary: #2563eb;
       --primary-dark: #1d4ed8;
       --accent: #0ea5e9;
+      --pink: #ec4899;
       --success: #15803d;
       --success-bg: #dcfce7;
       --warning: #b45309;
       --warning-bg: #fef3c7;
       --danger: #dc2626;
       --danger-bg: #fee2e2;
-      --shadow: 0 16px 38px rgba(15, 23, 42, 0.12);
+      --shadow: 0 18px 42px rgba(15, 23, 42, 0.14);
       --focus: #93c5fd;
+      --radius: 24px;
     }
 
     * {
@@ -32,28 +36,167 @@
 
     html {
       -webkit-text-size-adjust: 100%;
+      scroll-behavior: smooth;
     }
 
     body {
       margin: 0;
       min-height: 100vh;
+      overflow-x: hidden;
       background:
-        radial-gradient(circle at top left, rgba(14, 165, 233, 0.18), transparent 30rem),
-        linear-gradient(180deg, var(--bg-start) 0%, var(--bg-end) 42%);
+        radial-gradient(circle at 18% 6%, rgba(250, 204, 21, 0.28), transparent 10rem),
+        radial-gradient(circle at 92% 18%, rgba(236, 72, 153, 0.16), transparent 12rem),
+        linear-gradient(180deg, #7dd3fc 0%, #dbeafe 36%, #f8fafc 72%);
       color: var(--text);
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       line-height: 1.5;
     }
 
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      z-index: -1;
+      pointer-events: none;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.76);
+      filter: blur(1px);
+    }
+
+    body::before {
+      top: calc(env(safe-area-inset-top, 0px) + 74px);
+      left: -46px;
+      width: 185px;
+      height: 58px;
+      box-shadow: 165px 22px 0 8px rgba(255, 255, 255, 0.42);
+    }
+
+    body::after {
+      top: calc(env(safe-area-inset-top, 0px) + 150px);
+      right: -68px;
+      width: 220px;
+      height: 66px;
+      box-shadow: -150px 28px 0 -4px rgba(255, 255, 255, 0.48);
+    }
+
+    .flight-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      height: calc(env(safe-area-inset-top, 0px) + 132px);
+      overflow: visible;
+      pointer-events: none;
+      transform: translateZ(0);
+    }
+
+    .flight-path {
+      position: absolute;
+      top: calc(env(safe-area-inset-top, 0px) + 18px);
+      left: 0;
+      width: 100%;
+      height: 112px;
+    }
+
+    .flight-path::before {
+      content: "";
+      position: absolute;
+      inset: 8px 16px auto;
+      height: 72px;
+      border-top: 2px dashed rgba(255, 255, 255, 0.72);
+      border-radius: 50%;
+      opacity: 0.72;
+    }
+
+    .plane {
+      position: absolute;
+      top: 38px;
+      left: 0;
+      width: 72px;
+      height: 72px;
+      display: grid;
+      place-items: center;
+      font-size: 48px;
+      line-height: 1;
+      opacity: 0;
+      filter: drop-shadow(0 10px 12px rgba(15, 23, 42, 0.24));
+      transform: translateX(-96px) translateY(12px) rotate(10deg);
+      will-change: transform, opacity;
+    }
+
+    .plane::after {
+      content: "";
+      position: absolute;
+      right: 50px;
+      width: 92px;
+      height: 12px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.82), rgba(34, 211, 238, 0.58));
+      transform: rotate(5deg);
+      opacity: 0.86;
+    }
+
+    .plane.flying {
+      animation: fly-over-screen var(--flight-duration, 3s) cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+
+    @keyframes fly-over-screen {
+      0% {
+        opacity: 0;
+        transform: translateX(-110px) translateY(26px) rotate(10deg) scale(0.9);
+      }
+      8% {
+        opacity: 1;
+      }
+      22% {
+        transform: translateX(20vw) translateY(2px) rotate(3deg) scale(1.02);
+      }
+      44% {
+        transform: translateX(44vw) translateY(34px) rotate(13deg) scale(1.06);
+      }
+      66% {
+        transform: translateX(68vw) translateY(6px) rotate(4deg) scale(1.03);
+      }
+      88% {
+        opacity: 1;
+        transform: translateX(88vw) translateY(30px) rotate(12deg) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translateX(calc(100vw + 110px)) translateY(14px) rotate(8deg) scale(0.92);
+      }
+    }
+
     .app {
       width: min(100%, 760px);
       margin: 0 auto;
-      padding: 18px 14px 42px;
+      padding: calc(env(safe-area-inset-top, 0px) + 22px) 14px 46px;
     }
 
     header {
-      padding: 8px 4px 14px;
-      text-align: center;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 16px;
+      padding: 26px 18px 24px;
+      color: #0f172a;
+      text-align: left;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(240, 249, 255, 0.86)),
+        radial-gradient(circle at 82% 18%, rgba(250, 204, 21, 0.55), transparent 5.2rem);
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      border-radius: 30px;
+      box-shadow: var(--shadow);
+    }
+
+    header::after {
+      content: "🏝️";
+      position: absolute;
+      right: 12px;
+      bottom: -18px;
+      font-size: 5.4rem;
+      opacity: 0.2;
+      transform: rotate(-5deg);
     }
 
     h1,
@@ -64,14 +207,17 @@
     }
 
     h1 {
-      margin-bottom: 8px;
-      font-size: clamp(1.9rem, 8vw, 2.7rem);
-      letter-spacing: 0.02em;
+      position: relative;
+      z-index: 1;
+      margin-bottom: 10px;
+      font-size: clamp(2rem, 9vw, 3rem);
+      line-height: 1.08;
+      letter-spacing: 0.01em;
     }
 
     h2 {
       margin-bottom: 12px;
-      font-size: 1.28rem;
+      font-size: 1.25rem;
     }
 
     h3 {
@@ -80,17 +226,35 @@
     }
 
     .lead {
-      margin-bottom: 0;
-      color: var(--muted);
-      font-size: 0.98rem;
+      position: relative;
+      z-index: 1;
+      margin-bottom: 14px;
+      color: #334155;
+      font-size: 1rem;
+      font-weight: 650;
+    }
+
+    .hero-badge {
+      position: relative;
+      z-index: 1;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-size: 0.92rem;
+      font-weight: 900;
     }
 
     .card {
-      background: rgba(255, 255, 255, 0.96);
-      border: 1px solid rgba(219, 228, 239, 0.95);
-      border-radius: 22px;
+      background: var(--card);
+      border: 1px solid rgba(219, 228, 239, 0.9);
+      border-radius: var(--radius);
       box-shadow: var(--shadow);
       padding: 16px;
+      backdrop-filter: blur(10px);
     }
 
     .stack {
@@ -111,23 +275,87 @@
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      padding: 12px 14px;
+      padding: 13px 14px;
       background: #f8fbff;
       border: 1px solid var(--line);
-      border-radius: 16px;
+      border-radius: 18px;
+    }
+
+    .budget-item {
+      background: linear-gradient(135deg, #ffffff, #eff6ff);
     }
 
     .budget-name,
     .stat-label {
       color: var(--muted);
-      font-weight: 800;
+      font-weight: 850;
+    }
+
+    .budget-name::before {
+      margin-right: 7px;
+    }
+
+    .budget-item[data-category="朝食"] .budget-name::before {
+      content: "🌅";
+    }
+
+    .budget-item[data-category="昼食"] .budget-name::before {
+      content: "☀️";
+    }
+
+    .budget-item[data-category="夕食"] .budget-name::before {
+      content: "🌙";
     }
 
     .budget-amount,
     .stat-value {
-      font-size: 1.15rem;
-      font-weight: 900;
+      font-size: 1.16rem;
+      font-weight: 950;
       white-space: nowrap;
+    }
+
+    .result-card {
+      display: grid;
+      gap: 12px;
+      background:
+        linear-gradient(135deg, rgba(37, 99, 235, 0.96), rgba(14, 165, 233, 0.94)),
+        #2563eb;
+      color: #fff;
+      border: 0;
+    }
+
+    .result-card h2 {
+      margin-bottom: 0;
+    }
+
+    .result-message {
+      min-height: 3.2em;
+      margin: 0;
+      font-size: 1.05rem;
+      font-weight: 850;
+    }
+
+    .result-message.good,
+    .result-message.just,
+    .result-message.over {
+      color: #fff;
+    }
+
+    .result-chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .result-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.18);
+      font-size: 0.9rem;
+      font-weight: 850;
     }
 
     form {
@@ -137,12 +365,12 @@
 
     .fixed-category {
       margin: 0 0 12px;
-      padding: 10px 12px;
+      padding: 11px 12px;
       background: #eff6ff;
       border: 1px solid #bfdbfe;
-      border-radius: 14px;
+      border-radius: 16px;
       color: #1e40af;
-      font-weight: 800;
+      font-weight: 900;
     }
 
     .field {
@@ -164,9 +392,9 @@
     input,
     select {
       width: 100%;
-      min-height: 52px;
+      min-height: 54px;
       border: 1px solid var(--line);
-      border-radius: 14px;
+      border-radius: 16px;
       padding: 12px 14px;
       background: #fff;
       color: var(--text);
@@ -182,12 +410,12 @@
     }
 
     button {
-      min-height: 52px;
+      min-height: 54px;
       border: 0;
-      border-radius: 14px;
+      border-radius: 16px;
       padding: 12px 16px;
       cursor: pointer;
-      font-weight: 900;
+      font-weight: 950;
       touch-action: manipulation;
     }
 
@@ -197,7 +425,7 @@
       background: linear-gradient(135deg, var(--primary), var(--accent));
       color: #fff;
       font-size: 1.08rem;
-      box-shadow: 0 10px 18px rgba(37, 99, 235, 0.22);
+      box-shadow: 0 12px 20px rgba(37, 99, 235, 0.24);
     }
 
     .add-button:active,
@@ -210,96 +438,13 @@
       margin: 0;
       color: var(--danger);
       font-size: 0.92rem;
-      font-weight: 800;
-    }
-
-    .flight-panel {
-      position: relative;
-      overflow: hidden;
-      min-height: 132px;
-      background:
-        linear-gradient(180deg, #dff5ff 0%, #f7fdff 68%),
-        #e0f2fe;
-    }
-
-    .flight-panel::after {
-      content: "";
-      position: absolute;
-      right: -42px;
-      bottom: -52px;
-      width: 180px;
-      height: 92px;
-      background: rgba(255, 255, 255, 0.74);
-      border-radius: 999px;
-      box-shadow: -105px -18px 0 18px rgba(255, 255, 255, 0.45);
-    }
-
-    .flight-message {
-      position: relative;
-      z-index: 1;
-      margin: 0;
-      color: var(--muted);
-      font-weight: 800;
-    }
-
-    .flight-message.good {
-      color: var(--success);
-    }
-
-    .flight-message.just {
-      color: var(--warning);
-    }
-
-    .flight-message.over {
-      color: var(--danger);
-    }
-
-    .plane {
-      position: absolute;
-      z-index: 2;
-      left: -48px;
-      bottom: 34px;
-      font-size: 32px;
-      line-height: 1;
-      transform: translateX(0) translateY(0) rotate(10deg);
-      opacity: 0;
-      filter: drop-shadow(0 8px 8px rgba(15, 23, 42, 0.18));
-      pointer-events: none;
-    }
-
-    .plane.flying {
-      animation-name: fly-across;
-      animation-timing-function: ease-in-out;
-      animation-fill-mode: both;
-    }
-
-    @keyframes fly-across {
-      0% {
-        opacity: 0;
-        transform: translateX(-8vw) translateY(14px) rotate(8deg);
-      }
-      12% {
-        opacity: 1;
-      }
-      28% {
-        transform: translateX(28vw) translateY(-18px) rotate(3deg);
-      }
-      52% {
-        transform: translateX(55vw) translateY(10px) rotate(12deg);
-      }
-      76% {
-        transform: translateX(78vw) translateY(-16px) rotate(6deg);
-        opacity: 1;
-      }
-      100% {
-        opacity: 0;
-        transform: translateX(108vw) translateY(8px) rotate(10deg);
-      }
+      font-weight: 850;
     }
 
     .progress {
       display: grid;
       gap: 8px;
+      margin-top: 14px;
     }
 
     .progress-top {
@@ -308,11 +453,11 @@
       gap: 10px;
       color: var(--muted);
       font-size: 0.92rem;
-      font-weight: 800;
+      font-weight: 850;
     }
 
     .progress-track {
-      height: 14px;
+      height: 16px;
       overflow: hidden;
       background: #e2e8f0;
       border-radius: 999px;
@@ -321,9 +466,9 @@
     .progress-bar {
       width: 0%;
       height: 100%;
-      background: linear-gradient(90deg, #22c55e, #0ea5e9);
+      background: linear-gradient(90deg, #22c55e, #0ea5e9, #6366f1);
       border-radius: inherit;
-      transition: width 260ms ease;
+      transition: width 320ms ease;
     }
 
     .list-header {
@@ -337,7 +482,7 @@
     .count {
       color: var(--muted);
       font-size: 0.92rem;
-      font-weight: 750;
+      font-weight: 800;
     }
 
     .entries {
@@ -436,9 +581,19 @@
       text-align: center;
     }
 
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      .plane.flying {
+        animation-duration: 3s;
+      }
+    }
+
     @media (min-width: 640px) {
       .app {
-        padding-top: 30px;
+        padding-top: calc(env(safe-area-inset-top, 0px) + 30px);
       }
 
       .card {
@@ -481,15 +636,22 @@
   </style>
 </head>
 <body>
+  <div class="flight-overlay" aria-hidden="true">
+    <div class="flight-path">
+      <div id="plane" class="plane">✈️</div>
+    </div>
+  </div>
+
   <main class="app">
     <header>
-      <h1>家計メモ ✈️</h1>
-      <p class="lead">食事の支出をメモして、節約できた分だけ飛行機を飛ばします。</p>
+      <h1>家計メモ<br>節約フライト ✈️</h1>
+      <p class="lead">食事の支出をメモすると、予算より浮いた分だけ飛行機が旅立ちます。</p>
+      <span class="hero-badge">目的地: 30,000円の貯蓄ゴール</span>
     </header>
 
     <div class="stack">
       <section class="card" aria-labelledby="budget-title">
-        <h2 id="budget-title">食事カテゴリの仮置き予算</h2>
+        <h2 id="budget-title">今日の食事予算</h2>
         <div class="budget-grid" id="budget-list"></div>
       </section>
 
@@ -522,18 +684,21 @@
           </div>
 
           <p id="error" class="error" role="alert" aria-live="polite"></p>
-          <button class="add-button" type="submit">追加して飛行機チャレンジ</button>
+          <button class="add-button" type="submit">追加してフライト判定</button>
         </form>
       </section>
 
-      <section class="flight-panel card" aria-label="節約フライト">
-        <h2>節約フライト</h2>
-        <p id="flight-message" class="flight-message" aria-live="polite">支出を追加すると、節約額に応じたメッセージが表示されます。</p>
-        <div id="plane" class="plane" aria-hidden="true">✈️</div>
+      <section class="result-card card" aria-labelledby="result-title">
+        <h2 id="result-title">今回のフライト結果</h2>
+        <p id="flight-message" class="result-message" aria-live="polite">支出を追加すると、今回の節約額・予算ぴったり・予算オーバーをここに表示します。</p>
+        <div class="result-chip-row" aria-label="フライトのヒント">
+          <span class="result-chip">✈️ 節約できたら画面上部を飛行</span>
+          <span class="result-chip">🧭 大きな節約ほど長く飛行</span>
+        </div>
       </section>
 
       <section class="card" aria-labelledby="summary-title">
-        <h2 id="summary-title">集計</h2>
+        <h2 id="summary-title">貯蓄ゴールまでの旅</h2>
         <div class="stats-grid">
           <div class="stat-item">
             <span class="stat-label">合計金額</span>
@@ -561,7 +726,7 @@
 
       <section aria-label="登録済みデータ">
         <div class="list-header">
-          <h2>一覧</h2>
+          <h2>搭乗ログ</h2>
           <span id="count" class="count">0件</span>
         </div>
         <ul id="entries" class="entries"></ul>
@@ -656,7 +821,7 @@
 
     function renderBudgets() {
       budgetList.innerHTML = Object.entries(CATEGORY_BUDGETS).map(([name, budget]) => `
-        <div class="budget-item">
+        <div class="budget-item" data-category="${escapeHtml(name)}">
           <span class="budget-name">${escapeHtml(name)}</span>
           <strong class="budget-amount">${formatCurrency(budget)}</strong>
         </div>
@@ -683,7 +848,7 @@
       entries.forEach((entry) => {
         const saving = getSaving(entry);
         const savingClass = saving > 0 ? "positive" : saving === 0 ? "zero" : "negative";
-        const savingText = saving > 0 ? `節約 ${formatCurrency(saving)}` : saving === 0 ? "予算ぴったり" : `予算オーバー ${formatCurrency(Math.abs(saving))}`;
+        const savingText = saving > 0 ? `今回の節約額 ${formatCurrency(saving)}` : saving === 0 ? "予算ぴったり" : `予算オーバー ${formatCurrency(Math.abs(saving))}`;
         const item = document.createElement("li");
         item.className = "entry card";
         item.innerHTML = `
@@ -712,31 +877,40 @@
       amountInput.focus();
     }
 
-    function showSavingResult(saving) {
+    function showSavingResult(saving, subCategory) {
       flightMessage.classList.remove("good", "just", "over");
 
       if (saving > 0) {
-        flightMessage.textContent = `今回の節約額は ${formatCurrency(saving)} です。飛行機が節約フライトに出発しました！`;
+        flightMessage.textContent = `${subCategory}の今回の節約額は ${formatCurrency(saving)} です。画面上部を飛行機がフライト中です！`;
         flightMessage.classList.add("good");
         flyPlane(saving);
         return;
       }
 
-      plane.classList.remove("flying");
+      resetPlaneAnimation();
       if (saving === 0) {
-        flightMessage.textContent = "予算ぴったりです。飛行機は待機中です。";
+        flightMessage.textContent = `${subCategory}は予算ぴったりです。今日はきれいに着地しました。`;
         flightMessage.classList.add("just");
       } else {
-        flightMessage.textContent = `予算オーバーです。超過額は ${formatCurrency(Math.abs(saving))} です。`;
+        flightMessage.textContent = `${subCategory}は予算オーバーです。超過額は ${formatCurrency(Math.abs(saving))} です。次のフライトで取り戻しましょう。`;
         flightMessage.classList.add("over");
       }
     }
 
-    function flyPlane(saving) {
-      const duration = Math.min(8, 1.8 + saving / 1200 * 6.2);
+    function resetPlaneAnimation() {
       plane.classList.remove("flying");
+      plane.style.removeProperty("--flight-duration");
       void plane.offsetWidth;
-      plane.style.animationDuration = duration + "s";
+    }
+
+    function getFlightDuration(saving) {
+      return Math.min(8, Math.max(3, 3 + saving / 5000 * 5));
+    }
+
+    function flyPlane(saving) {
+      const duration = getFlightDuration(saving);
+      resetPlaneAnimation();
+      plane.style.setProperty("--flight-duration", duration + "s");
       plane.classList.add("flying");
     }
 
@@ -772,7 +946,7 @@
       entries.unshift(entry);
       saveEntries();
       renderEntries();
-      showSavingResult(saving);
+      showSavingResult(saving, subCategory);
       resetForm();
     });
 
